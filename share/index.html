@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#174A49" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="description" content="A little progress, worth sharing. Make room for yourself, one small step at a time with Patch." />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="A little progress, worth sharing · Patch" />
+  <meta property="og:description" content="Someone shared a little piece of their journey. Open their Patch card, then start your own." />
+  <meta property="og:image" content="https://haydohuthman-hash.github.io/lung-ai-legal/share/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Patch: one little step at a time, with our orange felt companion." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="A little progress, worth sharing · Patch" />
+  <meta name="twitter:description" content="Someone shared a little piece of their journey. Open their Patch card, then start your own." />
+  <meta name="twitter:image" content="https://haydohuthman-hash.github.io/lung-ai-legal/share/og.png" />
+  <title>A little progress, worth sharing · Patch</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="header"><a class="wordmark" href="https://apps.apple.com/app/id6810251830" aria-label="Patch on the App Store">p<span class="wordmark-a">a<i aria-hidden="true"></i></span>tch</a><span class="header-note">one little step at a time</span></header>
+  <main>
+    <div class="intro"><span class="eyebrow">A LITTLE PROGRESS, WORTH SHARING</span><h1>Small steps.<br /> Real pride.</h1><p>Someone is making a little room for themselves. This is a piece of their journey.</p><a class="primary intro-cta" href="https://apps.apple.com/app/id6810251830">Start your own journey <span aria-hidden="true">↗</span></a><span class="intro-footnote">Meet Patch, your little companion for change.</span></div>
+    <section class="shared" aria-label="Shared Patch progress">
+      <article class="card" id="progress-card" hidden>
+        <div class="card-inner"><span class="wordmark card-wordmark" aria-label="Patch">p<span class="wordmark-a">a<i aria-hidden="true"></i></span>tch</span><span class="card-kicker">ONE LITTLE STEP AT A TIME</span><h2 class="day-heading"><span class="day-label">day</span><span class="day-number" id="day-number"></span><span class="day-caption">of my journey</span></h2><img class="mascot" src="./mascot.png" width="360" height="360" alt="Patch, a little orange felt companion" /><blockquote id="quote"></blockquote></div>
+        <footer class="card-footer">Make a little room for yourself.<span>Find Patch on the App Store</span></footer>
+      </article>
+      <article class="unavailable" id="unavailable" hidden><img src="./mascot.png" width="210" height="210" alt="Patch, your little companion" /><h2>This card needs a fresh link.</h2><p>Ask the person who shared it to copy their link again. Your own little journey can begin whenever you're ready.</p></article>
+      <noscript><div class="unavailable"><h2>A little progress, worth sharing.</h2><p>Turn on JavaScript to see this person's day and quote. You can also find Patch on the App Store below.</p></div></noscript>
+      <div class="card-actions" id="card-actions" hidden><button class="secondary" id="share-button" type="button">Share this card <span aria-hidden="true">↗</span></button><button class="secondary" id="save-button" type="button" disabled>Preparing image…</button></div>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+      <div class="manual-copy" id="manual-copy" hidden><label for="share-link">Copy this link</label><input id="share-link" readonly /></div>
+      <p class="snapshot-note" id="snapshot-note" hidden>A moment from their journey. This day count stays as it was when shared.</p>
+    </section>
+    <section class="bottom-cta"><span class="eyebrow">YOUR NEXT LITTLE CHAPTER</span><h2>You deserve a little<br />space to grow, too.</h2><p>Choose small daily challenges. Notice your progress. Keep your earned patches along the way.</p><a class="primary" href="https://apps.apple.com/app/id6810251830">Find Patch on the App Store <span aria-hidden="true">↗</span></a></section>
+  </main>
+  <footer class="page-footer"><span>Made for your next little step.</span><nav aria-label="Legal"><a href="../privacy.html">Privacy</a><a href="../terms.html">Terms</a></nav></footer>
+  <script type="module" src="./page.js"></script>
+</body>
+</html>
