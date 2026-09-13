@@ -1,4 +1,4 @@
-import { createProgressShare, SHARE_QUOTES } from './model.js';
+import { validateProgressShare, getJourneyTimer, formatJourneyClock, SHARE_QUOTES } from './model.js';
 
 function loadImage(url) {
   return new Promise((resolve, reject) => {
@@ -23,7 +23,9 @@ function linesFor(ctx, text, width) {
 
 /** Code-drawn artwork, exported at full social-feed resolution. */
 export async function renderProgressCard(snapshot, options = {}) {
-  const valid = createProgressShare(snapshot.days, snapshot.quoteId);
+  const valid = validateProgressShare(snapshot);
+  const timer = 'startedAt' in valid ? getJourneyTimer(valid.startedAt, options.now ?? Date.now()) : null;
+  const dayNumber = timer ? timer.dayNumber : valid.days;
   const quote = SHARE_QUOTES.find(item => item.id === valid.quoteId);
   const mascotUrl = options.mascotUrl ?? './mascot.png';
   const displayFont = options.displayFont ?? 'Patch Fraunces';
@@ -54,14 +56,22 @@ export async function renderProgressCard(snapshot, options = {}) {
   ctx.fillStyle = '#526C61'; ctx.font = `600 25px "${bodyFont}", sans-serif`;
   ctx.fillText('ONE LITTLE STEP AT A TIME', 540, 214);
   ctx.fillStyle = teal;
-  ctx.font = `800 56px "${displayFont}", Georgia, serif`; ctx.fillText('day', 540, 301);
-  ctx.font = `800 ${valid.days >= 10000 ? 178 : valid.days >= 1000 ? 216 : 258}px "${displayFont}", Georgia, serif`;
-  ctx.fillText(String(valid.days), 540, 463);
+  ctx.font = `800 56px "${displayFont}", Georgia, serif`; ctx.fillText('day', 540, timer ? 284 : 301);
+  ctx.font = `800 ${dayNumber >= 100000 ? 132 : dayNumber >= 10000 ? 178 : dayNumber >= 1000 ? 216 : 258}px "${displayFont}", Georgia, serif`;
+  ctx.fillText(String(dayNumber), 540, timer ? 414 : 463);
+  if (timer) {
+    ctx.font = `650 70px "${bodyFont}", sans-serif`;
+    ctx.fillText(formatJourneyClock(timer), 540, 567);
+    ctx.fillStyle = '#526C61'; ctx.font = `600 18px "${bodyFont}", sans-serif`;
+    ctx.fillText('HOURS     ·     MINUTES     ·     SECONDS', 540, 617);
+  }
   ctx.font = `500 28px "${bodyFont}", sans-serif`; ctx.fillStyle = '#526C61';
-  ctx.fillText('of my journey', 540, 615);
+  ctx.fillText('of my journey', 540, timer ? 663 : 615);
   ctx.save(); ctx.globalCompositeOperation = 'multiply';
   // The exported local asset is already the happy sprite, cropped from the atlas.
-  ctx.drawImage(mascot, 374, 651, 332, 332); ctx.restore();
+  if (timer) ctx.drawImage(mascot, 400, 698, 280, 280);
+  else ctx.drawImage(mascot, 374, 651, 332, 332);
+  ctx.restore();
   ctx.fillStyle = teal; ctx.font = `650 49px "${displayFont}", Georgia, serif`;
   const lines = linesFor(ctx, `“${quote.text}”`, 810);
   lines.forEach((line, i) => ctx.fillText(line, 540, 1050 + (i - (lines.length - 1) / 2) * 61));
