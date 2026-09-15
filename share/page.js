@@ -9,6 +9,8 @@ const refreshButton = document.querySelector('#refresh-image');
 const imageNote = document.querySelector('#image-note');
 let file;
 const cancelled = error => error?.name === 'AbortError' || /^share cancel(?:led|ed)$/i.test(error?.message ?? '');
+const scheduledAt = now => snapshot && 'startedAt' in snapshot && Date.parse(snapshot.startedAt) > now;
+const shareTitle = now => scheduledAt(now) ? 'My journey starts soon · Patch' : `Day ${progressShareDay(snapshot, now)} · Patch`;
 
 if (snapshot) {
   const quote = SHARE_QUOTES.find(item => item.id === snapshot.quoteId);
@@ -21,6 +23,17 @@ if (snapshot) {
     document.querySelector('#day-number').dataset.digits = String(day).length;
     if (liveTimer) {
       const timer = getJourneyTimer(snapshot.startedAt, now);
+      const scheduled = Date.parse(snapshot.startedAt) > now;
+      document.querySelector('.day-label').textContent = scheduled ? 'my journey starts' : 'day';
+      document.querySelector('.day-caption').textContent = scheduled ? 'A fresh beginning.' : 'of my journey';
+      document.querySelector('#day-number').hidden = scheduled;
+      document.querySelector('.clock-labels').hidden = scheduled;
+      if (scheduled) {
+        document.title = 'My journey starts soon · Patch';
+        document.querySelector('#journey-clock').textContent = new Date(snapshot.startedAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+        document.querySelector('#journey-clock').setAttribute('aria-label', `Scheduled journey start ${new Date(snapshot.startedAt).toLocaleString()}`);
+        return;
+      }
       document.querySelector('#journey-clock').textContent = formatJourneyClock(timer);
       document.querySelector('#journey-clock').setAttribute('aria-label', `${timer.hours} hours, ${timer.minutes} minutes, ${timer.seconds} seconds`);
     }
@@ -53,7 +66,7 @@ shareButton.addEventListener('click', async () => {
   if (!snapshot) return;
   status.textContent = '';
   const now = Date.now();
-  const data = { title: `Day ${progressShareDay(snapshot, now)} · Patch`, text: progressShareText(snapshot, now), url: buildProgressShareUrl(snapshot) };
+  const data = { title: shareTitle(now), text: progressShareText(snapshot, now), url: buildProgressShareUrl(snapshot) };
   try {
     if (navigator.share) { await navigator.share(data); return; }
     if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
@@ -77,9 +90,9 @@ async function prepareImage() {
   status.textContent = '';
   try {
     const blob = await renderProgressCard(snapshot, { now: capturedAt });
-    file = new File([blob], `Patch-day-${progressShareDay(snapshot, capturedAt)}.png`, { type: 'image/png', lastModified: capturedAt });
+    file = new File([blob], scheduledAt(capturedAt) ? 'Patch-my-journey-starts.png' : `Patch-day-${progressShareDay(snapshot, capturedAt)}.png`, { type: 'image/png', lastModified: capturedAt });
     const clock = 'startedAt' in snapshot ? ` · ${formatJourneyClock(getJourneyTimer(snapshot.startedAt, capturedAt))}` : '';
-    imageNote.textContent = `Image snapshot: Day ${progressShareDay(snapshot, capturedAt)}${clock}. Tap Save snapshot to share or download this still image.`;
+    imageNote.textContent = scheduledAt(capturedAt) ? 'Your chosen start time. Tap Save snapshot to share or download this image.' : `Image snapshot: Day ${progressShareDay(snapshot, capturedAt)}${clock}. Tap Save snapshot to share or download this still image.`;
     imageNote.hidden = false;
     refreshButton.hidden = false;
     saveButton.textContent = 'Save snapshot ↓';
@@ -101,7 +114,7 @@ saveButton.addEventListener('click', async () => {
   let canShare = false;
   try { canShare = Boolean(navigator.share && navigator.canShare?.({ files: [file] })); } catch { /* Use download. */ }
   try {
-    if (canShare) { await navigator.share({ title: `Day ${progressShareDay(snapshot, file.lastModified)} · Patch`, text: progressShareText(snapshot, file.lastModified), files: [file] }); return; }
+    if (canShare) { await navigator.share({ title: shareTitle(file.lastModified), text: progressShareText(snapshot, file.lastModified), files: [file] }); return; }
     const url = URL.createObjectURL(file), anchor = document.createElement('a');
     anchor.href = url; anchor.download = file.name; document.body.append(anchor); anchor.click(); anchor.remove();
     setTimeout(() => URL.revokeObjectURL(url), 60_000);

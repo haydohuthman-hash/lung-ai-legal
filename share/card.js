@@ -25,6 +25,7 @@ function linesFor(ctx, text, width) {
 export async function renderProgressCard(snapshot, options = {}) {
   const valid = validateProgressShare(snapshot);
   const timer = 'startedAt' in valid ? getJourneyTimer(valid.startedAt, options.now ?? Date.now()) : null;
+  const scheduled = 'startedAt' in valid && Date.parse(valid.startedAt) > (options.now ?? Date.now());
   const dayNumber = timer ? timer.dayNumber : valid.days;
   const quote = SHARE_QUOTES.find(item => item.id === valid.quoteId);
   const mascotUrl = options.mascotUrl ?? './mascot.png';
@@ -56,17 +57,18 @@ export async function renderProgressCard(snapshot, options = {}) {
   ctx.fillStyle = '#526C61'; ctx.font = `600 25px "${bodyFont}", sans-serif`;
   ctx.fillText('ONE LITTLE STEP AT A TIME', 540, 214);
   ctx.fillStyle = teal;
-  ctx.font = `800 56px "${displayFont}", Georgia, serif`; ctx.fillText('day', 540, timer ? 284 : 301);
+  ctx.font = `800 56px "${displayFont}", Georgia, serif`; ctx.fillText(scheduled ? 'my journey starts' : 'day', 540, timer ? 284 : 301);
   ctx.font = `800 ${dayNumber >= 100000 ? 132 : dayNumber >= 10000 ? 178 : dayNumber >= 1000 ? 216 : 258}px "${displayFont}", Georgia, serif`;
-  ctx.fillText(String(dayNumber), 540, timer ? 414 : 463);
+  if (scheduled) ctx.font = `800 96px "${displayFont}", Georgia, serif`;
+  ctx.fillText(scheduled ? new Date(valid.startedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : String(dayNumber), 540, timer ? 414 : 463);
   if (timer) {
     ctx.font = `650 70px "${bodyFont}", sans-serif`;
-    ctx.fillText(formatJourneyClock(timer), 540, 567);
+    ctx.fillText(scheduled ? new Date(valid.startedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : formatJourneyClock(timer), 540, 567);
     ctx.fillStyle = '#526C61'; ctx.font = `600 18px "${bodyFont}", sans-serif`;
-    ctx.fillText('HOURS     ·     MINUTES     ·     SECONDS', 540, 617);
+    ctx.fillText(scheduled ? 'A FRESH BEGINNING' : 'HOURS     ·     MINUTES     ·     SECONDS', 540, 617);
   }
   ctx.font = `500 28px "${bodyFont}", sans-serif`; ctx.fillStyle = '#526C61';
-  ctx.fillText('of my journey', 540, timer ? 663 : 615);
+  ctx.fillText(scheduled ? 'One small promise to myself.' : 'of my journey', 540, timer ? 663 : 615);
   ctx.save(); ctx.globalCompositeOperation = 'multiply';
   // The exported local asset is already the happy sprite, cropped from the atlas.
   if (timer) ctx.drawImage(mascot, 400, 698, 280, 280);

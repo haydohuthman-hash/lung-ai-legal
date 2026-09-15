@@ -96,6 +96,7 @@ export function progressShareText(snapshot, now = Date.now()) {
   const quote = SHARE_QUOTES.find(item => item.id === valid.quoteId);
   if ('startedAt' in valid) {
     const timer = getJourneyTimer(valid.startedAt, now);
+    if (Date.parse(valid.startedAt) > now) return `My journey with Patch starts ${new Date(valid.startedAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}.\n“${quote.text}”`;
     return `Day ${timer.dayNumber} · ${formatJourneyClock(timer)} of my journey with Patch.\n“${quote.text}”`;
   }
   return `Day ${valid.days} of my journey with Patch.\n“${quote.text}”`;
